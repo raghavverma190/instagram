@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Button,
+  Image,
+} from 'react-native';
 import { Camera } from 'expo-camera';
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
+  const [camera, setCamera] = useState(null);
+  const [image, setImage] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
 
   useEffect(() => {
@@ -13,6 +22,14 @@ export default function App() {
     })();
   }, []);
 
+  const takePicture = async () => {
+    if (camera) {
+      const data = await camera.takePictureAsync(null);
+      setImage(data.uri);
+      // console.log(image);
+    }
+  };
+
   if (hasPermission === null) {
     return <View />;
   }
@@ -20,47 +37,38 @@ export default function App() {
     return <Text>No access to camera</Text>;
   }
   return (
-    <View style={styles.container}>
-      <Camera style={styles.camera} type={type}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              setType(
-                type === Camera.Constants.Type.back
-                  ? Camera.Constants.Type.front
-                  : Camera.Constants.Type.back
-              );
-            }}
-          >
-            <Text style={styles.text}> Flip </Text>
-          </TouchableOpacity>
-        </View>
-      </Camera>
+    <View style={{ flex: 1 }}>
+      <View style={styles.cameraContainer}>
+        <Camera
+          style={styles.fixedRatio}
+          type={type}
+          ratio={'1:1'}
+          ref={(ref) => setCamera(ref)}
+        />
+      </View>
+      <Button
+        onPress={() => {
+          setType(
+            type === Camera.Constants.Type.back
+              ? Camera.Constants.Type.front
+              : Camera.Constants.Type.back
+          );
+        }}
+        title='Flip Image'
+      />
+      <Button title='Take Picture' onPress={() => takePicture()} />
+      {image && <Image source={{ uri: image }} style={{ flex: 1 }} />}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  cameraContainer: {
     flex: 1,
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    backgroundColor: 'transparent',
     flexDirection: 'row',
-    margin: 20,
   },
-  button: {
-    flex: 0.1,
-    alignSelf: 'flex-end',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 18,
-    color: 'white',
+  fixedRatio: {
+    flex: 1,
+    aspectRatio: 1,
   },
 });
