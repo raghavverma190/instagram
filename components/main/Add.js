@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Platform, Button, Image } from 'react-native';
+import { StyleSheet, Text, View, Button, Image } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 
-export default function App() {
+export default function Add({ navigation }) {
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [camera, setCamera] = useState(null);
@@ -24,7 +24,6 @@ export default function App() {
     if (camera) {
       const data = await camera.takePictureAsync(null);
       setImage(data.uri);
-      // console.log(image);
     }
   };
 
@@ -52,13 +51,15 @@ export default function App() {
     <View style={{ flex: 1 }}>
       <View style={styles.cameraContainer}>
         <Camera
+          ref={(ref) => setCamera(ref)}
           style={styles.fixedRatio}
           type={type}
           ratio={'1:1'}
-          ref={(ref) => setCamera(ref)}
         />
       </View>
+
       <Button
+        title='Flip Image'
         onPress={() => {
           setType(
             type === Camera.Constants.Type.back
@@ -66,10 +67,13 @@ export default function App() {
               : Camera.Constants.Type.back
           );
         }}
-        title='Flip Image'
-      />
+      ></Button>
       <Button title='Take Picture' onPress={() => takePicture()} />
       <Button title='Pick Image From Gallery' onPress={() => pickImage()} />
+      <Button
+        title='Save'
+        onPress={() => navigation.navigate('Save', { image })}
+      />
       {image && <Image source={{ uri: image }} style={{ flex: 1 }} />}
     </View>
   );
