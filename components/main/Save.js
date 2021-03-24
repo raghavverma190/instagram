@@ -25,7 +25,7 @@ export default function Save(props) {
 
     const taskCompleted = () => {
       task.snapshot.ref.getDownloadURL().then((snapshot) => {
-        console.log(snapshot);
+        savePostData(snapshot);
       });
     };
 
@@ -34,6 +34,21 @@ export default function Save(props) {
     };
 
     task.on('state_changed', taskProgress, taskError, taskCompleted);
+  };
+  const savePostData = (downloadURL) => {
+    firebase
+      .firestore()
+      .collection('posts')
+      .doc(firebase.auth().currentUser.uid)
+      .collection('userPosts')
+      .add({
+        downloadURL,
+        caption,
+        creation: firebase.firestore.FieldValue.serverTimestamp(),
+      })
+      .then(function () {
+        props.navigation.popToTop();
+      });
   };
 
   return (

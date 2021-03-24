@@ -12,22 +12,15 @@ export class Login extends Component {
       password: '',
     };
 
-    this.onSignUp = this.onSignIn.bind(this);
+    this.onSignUp = this.onSignUp.bind(this);
   }
 
-  onSignIn() {
+  onSignUp() {
     const { email, password } = this.state;
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then((result) => {
-        firebase
-          .firestore()
-          .collection('users')
-          .doc(firebase.auth().currentUser.uid)
-          .set({
-            email,
-          });
         console.log(result);
       })
       .catch((error) => {
@@ -47,7 +40,8 @@ export class Login extends Component {
           secureTextEntry={true}
           onChangeText={(password) => this.setState({ password })}
         />
-        <Button onPress={() => this.onSignIn()} title='Sign Up' />
+
+        <Button onPress={() => this.onSignUp()} title='Sign In' />
       </View>
     );
   }
