@@ -25,6 +25,7 @@ export class Main extends Component {
   componentDidMount() {
     this.props.fetchUser();
     this.props.fetchUserPosts();
+    this.props.fetchUserFollowing();
   }
   render() {
     return (
@@ -93,6 +94,9 @@ const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
 });
 const mapDispatchProps = (dispatch) =>
-  bindActionCreators({ fetchUser, fetchUserPosts }, dispatch);
+  bindActionCreators(
+    { fetchUser, fetchUserPosts, fetchUserFollowing },
+    dispatch
+  );
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);

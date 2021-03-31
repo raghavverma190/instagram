@@ -46,12 +46,13 @@ function Profile(props) {
         });
     }
 
-    // if (props.following.indexOf(props.route.params.uid) > -1) {
-    //   setFollowing(true);
-    // } else {
-    //   setFollowing(false);
-    // }
-  }, [props.route.params.uid]);
+    if (props.following.indexOf(props.route.params.uid) > -1) {
+      //following from redux store
+      setFollowing(true);
+    } else {
+      setFollowing(false);
+    }
+  }, [props.route.params.uid, props.following]);
 
   const { currentUser, posts } = props;
 
