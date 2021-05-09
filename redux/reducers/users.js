@@ -22,9 +22,7 @@ export const users = (state = initialState, action) => {
       return {
         ...state,
         usersFollowingLoaded: state.usersFollowingLoaded + 1,
-        users: state.users.map((user) =>
-          user.uid === action.uid ? { ...user, posts: action.posts } : user
-        ),
+        feed: [...state.feed, ...action.posts],
       };
     case USERS_LIKES_STATE_CHANGE:
       return {

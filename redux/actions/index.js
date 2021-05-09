@@ -11,6 +11,11 @@ import firebase from 'firebase';
 import { SnapshotViewIOSComponent } from 'react-native';
 require('firebase/firestore');
 
+export function clearData() {
+  return (dispatch) => {
+    dispatch({ type: CLEAR_DATA });
+  };
+}
 export function fetchUser() {
   return (dispatch) => {
     firebase
@@ -43,40 +48,13 @@ export function fetchUserPosts() {
           const id = doc.id;
           return { id, ...data };
         });
-        // console.log(posts);
         dispatch({ type: USER_POSTS_STATE_CHANGE, posts });
       });
   };
 }
 
-export function fetchUsersFollowingPosts(uid) {
-  return (dispatch, getState) => {
-    firebase
-      .firestore()
-      .collection('posts')
-      .doc(uid)
-      .collection('userPosts')
-      .orderBy('creation', 'asc')
-      .get()
-      .then((snapshot) => {
-        const uid = snapshot.query.EP.path.segments[1];
-        console.log({ snapshot, uid });
-        const found = getState().usersState.users.find((el) => el.uid === uid);
-
-        let posts = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const id = doc.id;
-          return { id, ...data, user };
-        });
-        console.log(posts);
-        dispatch({ type: USERS_POSTS_STATE_CHANGE, posts, uid });
-        console.log(getState());
-      });
-  };
-}
-
 export function fetchUserFollowing() {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     firebase
       .firestore()
       .collection('following')
@@ -88,6 +66,7 @@ export function fetchUserFollowing() {
           return id;
         });
         dispatch({ type: USER_FOLLOWING_STATE_CHANGE, following });
+        // console.log(getState());
         for (let i = 0; i < following.length; i++) {
           dispatch(fetchUsersData(following[i], true));
         }
@@ -110,6 +89,7 @@ export function fetchUsersData(uid, getPosts) {
             user.uid = snapshot.id;
 
             dispatch({ type: USERS_DATA_STATE_CHANGE, user });
+            // console.log(getState());
           } else {
             console.log('does not exist');
           }
@@ -118,5 +98,53 @@ export function fetchUsersData(uid, getPosts) {
         dispatch(fetchUsersFollowingPosts(uid));
       }
     }
+  };
+}
+
+export function fetchUsersFollowingPosts(uid) {
+  return (dispatch, getState) => {
+    firebase
+      .firestore()
+      .collection('posts')
+      .doc(uid)
+      .collection('userPosts')
+      .orderBy('creation', 'asc')
+      .get()
+      .then((snapshot) => {
+        const uid = snapshot.query.EP.path.segments[1];
+        console.log(uid);
+        const user = getState().usersState.users.find((el) => el.uid === uid);
+
+        let posts = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data, user };
+        });
+
+        dispatch({ type: USERS_POSTS_STATE_CHANGE, posts, uid });
+      });
+  };
+}
+
+export function fetchUsersFollowingLikes(uid, postId) {
+  return (dispatch, getState) => {
+    firebase
+      .firestore()
+      .collection('posts')
+      .doc(uid)
+      .collection('userPosts')
+      .doc(postId)
+      .collection('likes')
+      .doc(firebase.auth().currentUser.uid)
+      .onSnapshot((snapshot) => {
+        const postId = snapshot.ZE.path.segments[3];
+
+        let currentUserLike = false;
+        if (snapshot.exists) {
+          currentUserLike = true;
+        }
+
+        dispatch({ type: USERS_LIKES_STATE_CHANGE, postId, currentUserLike });
+      });
   };
 }
