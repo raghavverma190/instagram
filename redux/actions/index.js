@@ -12,6 +12,7 @@ import { SnapshotViewIOSComponent } from 'react-native';
 require('firebase/firestore');
 
 export function clearData() {
+  //deleting everything from redux store
   return (dispatch) => {
     dispatch({ type: CLEAR_DATA });
   };
