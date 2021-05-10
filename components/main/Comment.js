@@ -8,11 +8,26 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { fetchUsersData } from '../../redux/actions/index';
 
-export default function Comment(props) {
+function Comment(props) {
   const [comments, setComments] = useState([]);
   const [postId, setPostId] = useState('');
   const [text, setText] = useState('');
   useEffect(() => {
+    function matchUserToComment(comments) {
+      //displaying comment along with user
+      for (let i = 0; i < comments.length; i++) {
+        if (comments[i].hasOwnProperty('user')) {
+          continue; //comment already has user
+        }
+        const user = props.users.find((x) => x.uid === comments[i].creator);
+        if (user == undefined) {
+          props.fetchUsersData(comments[i].creator, false); //dont need posts to be fetched
+        } else {
+          comments[i].user = user;
+        }
+      }
+      setComments(comments);
+    }
     if (props.route.params.postId !== postId) {
       firebase
         .firestore()
@@ -28,11 +43,29 @@ export default function Comment(props) {
             const id = doc.id;
             return { id, ...data };
           });
-          setComments(comments);
+          matchUserToComment(comments);
         });
       setPostId(props.route.params.postId);
+    } else {
+      //all comments wont be fetched again, only incremented
+      matchUserToComment(comments);
     }
-  }, [props.route.params.postId]);
+  }, [props.route.params.postId, props.users]);
+
+  const onCommentSend = () => {
+    firebase
+      .firestore()
+      .collection('posts')
+      .doc(props.route.params.uid)
+      .collection('userPosts')
+      .doc(props.route.params.postId)
+      .collection('comments')
+      .add({
+        creator: firebase.auth().currentUser.uid,
+        text,
+      });
+  };
+
   return (
     <View>
       <FlatList
@@ -41,10 +74,26 @@ export default function Comment(props) {
         data={comments}
         renderItem={({ item }) => (
           <View>
+            {item.user !== undefined ? <Text>{item.user.name}</Text> : null}
             <Text>{item.text}</Text>
           </View>
         )}
       />
+      <View>
+        <TextInput
+          placeholder='comment...'
+          onChangeText={(text) => setText(text)}
+        />
+        <Button onPress={() => onCommentSend()} title='Post Comment' />
+      </View>
     </View>
   );
 }
+
+const mapStateToProps = (store) => ({
+  users: store.usersState.users,
+});
+const mapDispatchProps = (dispatch) =>
+  bindActionCreators({ fetchUsersData }, dispatch);
+
+export default connect(mapStateToProps, mapDispatchProps)(Comment);
