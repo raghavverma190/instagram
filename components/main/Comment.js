@@ -12,15 +12,14 @@ export default function Comment(props) {
   const [comments, setComments] = useState([]);
   const [postId, setPostId] = useState('');
   const [text, setText] = useState('');
-
   useEffect(() => {
-    if (props.routes.params.postId !== postId) {
+    if (props.route.params.postId !== postId) {
       firebase
         .firestore()
         .collection('posts')
-        .doc(props.routes.params.uid)
+        .doc(props.route.params.uid)
         .collection('userPosts')
-        .doc(user.params.postId)
+        .doc(props.route.params.postId)
         .collection('comments')
         .get()
         .then((snapshot) => {
@@ -31,9 +30,9 @@ export default function Comment(props) {
           });
           setComments(comments);
         });
-      setPostId(props.routes.params.postId);
+      setPostId(props.route.params.postId);
     }
-  }, [props.routes.params.postId]);
+  }, [props.route.params.postId]);
   return (
     <View>
       <FlatList
