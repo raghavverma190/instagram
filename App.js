@@ -10,6 +10,7 @@ import RegisterScreen from './components/auth/Register';
 import MainScreen from './components/Main';
 import AddScreen from './components/main/Add';
 import SaveScreen from './components/main/Save';
+import CommentScreen from './components/main/Comment';
 
 import * as firebase from 'firebase';
 
@@ -99,6 +100,11 @@ export class App extends Component {
             <Stack.Screen
               name='Save'
               component={SaveScreen}
+              navigation={this.props.navigation}
+            />
+            <Stack.Screen
+              name='Comment'
+              component={CommentScreen}
               navigation={this.props.navigation}
             />
           </Stack.Navigator>
