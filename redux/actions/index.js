@@ -112,7 +112,7 @@ export function fetchUsersFollowingPosts(uid) {
       .get()
       .then((snapshot) => {
         const uid = snapshot.query.EP.path.segments[1];
-        console.log(uid);
+        // console.log(uid);
         const user = getState().usersState.users.find((el) => el.uid === uid);
 
         let posts = snapshot.docs.map((doc) => {

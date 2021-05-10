@@ -73,6 +73,7 @@ function Profile(props) {
   };
 
   const onLogout = () => {
+    //directly session destroyed
     firebase.auth().signOut();
   };
 
