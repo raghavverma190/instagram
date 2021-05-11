@@ -14,11 +14,12 @@ function Feed(props) {
       props.following.length !== 0
     ) {
       props.feed.sort(function (x, y) {
+        //sorting based on creation
         return x.creation - y.creation;
       });
       setPosts(props.feed);
     }
-    console.log(posts);
+    // console.log(posts);
   }, [props.usersFollowingLoaded, props.feed]);
 
   return (

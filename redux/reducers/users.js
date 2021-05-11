@@ -28,7 +28,7 @@ export const users = (state = initialState, action) => {
       return {
         ...state,
         feed: state.feed.map((post) =>
-          post.id == action.postId
+          post.id == action.postId //if post in feed found, like state(whether user has liked or not) updated
             ? { ...post, currentUserLike: action.currentUserLike }
             : post
         ),
